@@ -7,7 +7,8 @@ const List = () => {
 
       {상품.map((item, i) => {
         return (
-          <div className="food">
+          <div className="food" key={i}>
+            <img src={`food${i}.png`} alt="토마토" className="food-img" />
             <h4>{상품[i]} $40</h4>
           </div>
         );
