@@ -29,3 +29,22 @@ insert document를 누르면 키와 값을 입력하는 공간이 있고, 제일
 1. HTML페이지를 만들어 놓음(뼈대)
 2. 그 페이지 방문하면 DB에서 글 꺼내옴
 3. 글들을 HTML에 꽂아넣음
+
+
+// 기본적으로 next에서 라우팅 하는 방법은 다들 아실걸요. 근데 1000개도 넘는 페이지 만들겁니까? 그럴때에는 dynamic route 쓰면 됩니다. 비슷한 페이지는 여러개 만들 필요가 없습니다.
+1. 우선 폴더를 [작명] 작명합니다.
+2. 그러면 예를들어, detail/~ 뒤에 아무거나 입력해서 접속해도 하위 page.js를 보여줄것임.
+3. 근데 진짜 '아무거나'라고 해서 똑같은 내용만 보여주면 안되니까. 범위를 지정해주려면, 여타 다른 블로그의 라우팅 방식처럼, 게시글의 id값(유저가 URL에 입력할 값)을 detail/???에 들어오게 하면 되지요. 방법은 detail/??? 이하에 올 컴포넌트 안에서 props를 출력해보면 params에 대한 정보가 나온다!
+
+
+### 0908
+1. 상세페이지 만드는 것처럼 url과 여러페이지 만들려면 [Dynamic Route] 사용
+2. 현재 URL이 뭔지 궁금하면 props/useRouter
+3. 페이지 이동, prefetch 등은 useRouter
+
++
+usePathname() 쓰면 현재 URL 출력해주고 
+
+useSearchParams() 쓰면 search parameter (query string) 출력해주고
+
+useParams() 쓰면 [dynamic route]에 입력한내용 (URL 파라미터) 을 출력해줍니다. 
