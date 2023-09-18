@@ -9,7 +9,7 @@ export default function Write() {
           <button className="btn" type="submit">
             저장
           </button>
-          {/* name 프로퍼티는 body안에 입력한 value값과 함께 키값으로 담김 */}
+          {/* name 프로퍼티는 body안에 입력한 value값과 함께 키값으로 담김, 기존 몽고db는 _id가 있는데, 임의로 넣어주지 않아도 몽고에서 자동생성 해준다. */}
           <input name="title" placeholder="글제목" />
           <input name="content" placeholder="글내용" />
         </form>
