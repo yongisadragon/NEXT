@@ -21,7 +21,7 @@ export default function DetailLink() {
         router.push("/"); //push는 페이지 이동을 시켜줌
       }}
     >
-      홈페이지
+      홈페이지로!
     </button>
   );
 }
