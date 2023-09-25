@@ -6,11 +6,11 @@ export default async function List() {
   //await는 promise를 뱉는 코드에만 붙이기 가능
   const db = (await connectDB).db("forum");
   let result = await db.collection("post").find().toArray();
-  console.log(result[0]);
+  console.log(result);
   return (
     <div className="list-bg">
       {/* map 쓸떄에는 key속성 웬만하면 넣어주자. */}
-      {result?.map((item, i) => {
+      {result?.reverse().map((item, i) => {
         return (
           <div className="list-item" key={i}>
             <h4>{item.title}</h4>
@@ -19,9 +19,8 @@ export default async function List() {
             <Link prefetch={false} href={`detail/${item._id}`}>
               이동
             </Link>
-            <Link id={item._id} href={`/edit/${item._id}`}>
-              ✍🏽수정
-            </Link>
+            {/* edit페이지에서 url파라미터 id값을 사용하기 위한 드릴링 */}
+            <Link href={`/edit/${item._id}`}>✍🏽수정</Link>
             <DetailLink />
           </div>
         );
