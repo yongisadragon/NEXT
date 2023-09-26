@@ -14,7 +14,6 @@ export default async function Home() {
     <>
       <main>{result[0].title}</main>
       <h3>{result[0].content}</h3>
-      <Link href="/list">List</Link>
     </>
   );
 }

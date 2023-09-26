@@ -74,3 +74,11 @@ insert document를 누르면 키와 값을 입력하는 공간이 있고, 제일
 1. list에서 글 수정 버튼 하나씩 달아줍시다.
 2. 수정페이지를 만듭시다.(글도 db에서 가져오기)
 3. 수정페이지에서 글 발행 누르면 db에 있던 내용을 수정하도록 합시다.
+
+### 0926
+
+Nextjs 에선 server / client component 들을 보여줘야할 때 최대한 서버에서 미리 html을 만들어서 보내려고 하기 때문에 server - client로 감싸진 형태로 제작한뒤, DB에서 가져온 데이터를 server 컴포넌트에서 작성한뒤, props로 client로 전송해주는 방식으로 만들자. (seo를 고려할때에)
+
+fetch 코드가 길고 귀찮아서 편리하게 바꿔주는 axios같은 라이브러리 설치해서 쓰는 사람들이 많습니다. 근데 Nextjs 13부터는 fetch가 특별한 기능이 추가되어있기 때문에
+server component 함수 안에서 fetch() 쓸 일이 있을 경우 그거 그대로 쓰는게 좋습니다.
+지금의 client component 에선 라이브러리 설치하든 뭐하든 편한거 아무거나 대충 써도 됩니다.

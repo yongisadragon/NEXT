@@ -15,7 +15,7 @@ export default async function handler(req, res) {
       let result = await db
         .collection("post")
         .updateOne({ _id: new ObjectId(req.body._id) }, { $set: onlyBody });
-      // + &set 말고 $inc 는 기존 값에 증감한 해주는 방법임.
+      // + &set 이외에 $inc 라는 기존 값에 증감한 해주는 방법임.
       res.redirect(302, "/list");
     } catch (error) {}
   }
