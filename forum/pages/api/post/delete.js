@@ -12,6 +12,6 @@ export default async function handler(req, res) {
       // ???: 서버는 id값 모릅니다. 유저한테 보내라고 하든지, DB뒤져보든지 해야합니다.
       .deleteOne({ _id: new ObjectId(req.body) });
     console.log(result); //document 삭제결과 알려줌
-    res.status(200).json("삭제완료dd");
+    res.status(200).json("삭제완료");
   }
 }
