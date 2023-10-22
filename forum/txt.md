@@ -90,3 +90,24 @@ css에서 애니메 동작 전, 후 스타일만 생각하고 작성하면된다
 
 -지금까지 서버에 데이터를 보내는 방법으로,
 -fetch에서 body에 담는법, -<form>태그에서 <input>에 넣어 보내는법을 알아봤다.
+
+### 1022
+
+중요\*\* 기능구현 다 했다면 언제나 그 다음에 할 일은 성능향상입니다.
+2개의 rendering 방법과 캐싱기능에 대해 알아봅시다.
+
+우선 Next.js로 만든 서버를 어디 배포하려면 터미널 열어서 npm run build를 먼저 해야합니다.
+이상한 리액트 문법으로 작성한 코드들을 브라우저 친화적인 html, js, css 파일로 바꿔주는 작업입니다.
+그 다음에 npm run start 해두면 실제로 유저 요청을 처리할 수 있는 Next.js 서버가 완성됩니다.(개발 서버 아니고 실제 서버 띄워줌.)
+물론 실제 운영할 사이트면 AWS같은 클라우드에 올려서 npm run start 해놓으면 되는데 그건 나중에 해봅시다.
+
+run build를 하고나면 라우팅 된 페이지들을 보여주는데(이름과 사이즈 등을 알려줌), O는 static rendering(default) 해주겠다라는 의미이다.(npm run build 할 때 만든 html페이지 그대로 유저에게 보여줌). 람다(들입자)는 dynamic rendering 해주겠다는 의미이다. next에서 단순하게 page를 만들면 단순하게 static rendering 해준다.
+
+static rendering 단순한 기능. 미리페이지 완성본 만들어놨기 때문에 전송 빠름.
+dynamic rendering 유저가 페이지에 접속할떄마다 html 새로 만들어서 보내줌. npm run build 할때 만든건 버리고 새로 만들어줌.두개 방식의 구분은 자동으로 됨. fetch, useSearchParams(), cookies(), headers() [dynamic route] 페이지에서 사용시 자동으로 dynamic rendering 해줌.
+
+근데 간혹가다가 이상하게 작업된 페이지들이 있음. (예를 들어 DB에서 게시글 가져와하는 list는 static으로 되어있음. 매번 html을 새로 해줘야하는데도..) 그렇기 때문에 npm run build 과정이 중요하다. 단적인 예로 개발 서버 말고 npm run start 한 서버에서 글을 작성해보면 static rendering이 된 html을 가지고 있기 때문에 list에 새로운 글이 반영되지 않는다. 그롷다면 list 페이지를 dynamic rendering으로 만들어보자.
+
+list 페이지에서 export const dynamic = "force-dynamic"; 하면 dynamic, static으로 하면 static으로 전환해줌. 작성한 다음엔 꼭\* npm run build 과정을 거쳐주길 바람.
+
+하지만 dynamic rendering도 항상 html을 다시 그려야하기 때문에 유저가 많으면 서버나 DB무리가 갈 수도 있기 때문에 그럴때에는 '캐싱' 해줄 수 있따. 데이터를(완성본) 잠깐 몰래 저장해두고, 재사용 하는 것이다. 예를 들어 GET 요청 결과 같은 것을 잠깐 저장해두고 재사용이 가능하다.
