@@ -93,21 +93,77 @@ css에서 애니메 동작 전, 후 스타일만 생각하고 작성하면된다
 
 ### 1022
 
-중요\*\* 기능구현 다 했다면 언제나 그 다음에 할 일은 성능향상입니다.
-2개의 rendering 방법과 캐싱기능에 대해 알아봅시다.
+**_기능구현 다 했다면 언제나 그 다음에 할 일은 성능향상입니다.2개의 rendering 방법과 캐싱기능에 대해 알아봅시다._**
 
 우선 Next.js로 만든 서버를 어디 배포하려면 터미널 열어서 npm run build를 먼저 해야합니다.
 이상한 리액트 문법으로 작성한 코드들을 브라우저 친화적인 html, js, css 파일로 바꿔주는 작업입니다.
 그 다음에 npm run start 해두면 실제로 유저 요청을 처리할 수 있는 Next.js 서버가 완성됩니다.(개발 서버 아니고 실제 서버 띄워줌.)
 물론 실제 운영할 사이트면 AWS같은 클라우드에 올려서 npm run start 해놓으면 되는데 그건 나중에 해봅시다.
 
-run build를 하고나면 라우팅 된 페이지들을 보여주는데(이름과 사이즈 등을 알려줌), O는 static rendering(default) 해주겠다라는 의미이다.(npm run build 할 때 만든 html페이지 그대로 유저에게 보여줌). 람다(들입자)는 dynamic rendering 해주겠다는 의미이다. next에서 단순하게 page를 만들면 단순하게 static rendering 해준다.
+run build를 하고나면 라우팅 된 페이지들을 보여주는데(이름과 사이즈 등을 알려줌), O는 static rendering(default) 해주겠다라는 의미이다.(npm run build 할 때 만든 html페이지 그대로 유저에게 보여줌). λ(람다)는 dynamic rendering 해주겠다는 의미이다. next에서 단순하게 page를 만들면 단순하게 static rendering 해준다.
 
 static rendering 단순한 기능. 미리페이지 완성본 만들어놨기 때문에 전송 빠름.
 dynamic rendering 유저가 페이지에 접속할떄마다 html 새로 만들어서 보내줌. npm run build 할때 만든건 버리고 새로 만들어줌.두개 방식의 구분은 자동으로 됨. fetch, useSearchParams(), cookies(), headers() [dynamic route] 페이지에서 사용시 자동으로 dynamic rendering 해줌.
 
 근데 간혹가다가 이상하게 작업된 페이지들이 있음. (예를 들어 DB에서 게시글 가져와하는 list는 static으로 되어있음. 매번 html을 새로 해줘야하는데도..) 그렇기 때문에 npm run build 과정이 중요하다. 단적인 예로 개발 서버 말고 npm run start 한 서버에서 글을 작성해보면 static rendering이 된 html을 가지고 있기 때문에 list에 새로운 글이 반영되지 않는다. 그롷다면 list 페이지를 dynamic rendering으로 만들어보자.
 
-list 페이지에서 export const dynamic = "force-dynamic"; 하면 dynamic, static으로 하면 static으로 전환해줌. 작성한 다음엔 꼭\* npm run build 과정을 거쳐주길 바람.
+list 페이지에서 export const dynamic = "force-dynamic"; 하면+
 
-하지만 dynamic rendering도 항상 html을 다시 그려야하기 때문에 유저가 많으면 서버나 DB무리가 갈 수도 있기 때문에 그럴때에는 '캐싱' 해줄 수 있따. 데이터를(완성본) 잠깐 몰래 저장해두고, 재사용 하는 것이다. 예를 들어 GET 요청 결과 같은 것을 잠깐 저장해두고 재사용이 가능하다.
+force-dynamic' 넣으면 dynamic rendering을 해주고
+'force-static' 넣으면 static rendering을 해줍니다.
+**_ 작성한 다음엔 꼭\* npm run build 과정을 거쳐주길 바람. _**
+
+하지만 dynamic rendering도 항상 html을 다시 그려야하기 때문에 유저가 많으면 서버나 DB무리가 갈 수도 있기 때문에 그럴때에는 '캐싱' 해줄 수 있따. 데이터를(완성본) 잠깐 몰래 저장해두고, 재사용 하는 것이다. 이런식으로 캐싱하면 서버의 부담이 덜 해질 수 있다..
+
+캐싱기능
+예를 들어 GET 요청 결과 같은 것을 잠깐 저장해두고 재사용이 가능하다.
+
+```
+export default async function 페이지(){
+let result = await fetch('/api/어쩌구', { cache: 'force-cache' })
+}
+```
+
+fetch() 사용시 cache: 'force-cache' 설정을 넣어두면 캐싱해주고 앞으로 /URL로 요청할 때 마다 계속 캐싱된 결과를 가져와줍니다. 사이트 다시 npm run build 하기 전 까지 캐싱된걸 평생 보여줌
+
+(참고) 실은 { cache: 'force-cache' } 이거 안적어도 디폴트값은 cache: 'force-cache' 로 설정되어있습니다.
+
+이런식으로 저장하면 결과를 몰래 저장해두고 서버 요청이 있을 때마다 그것을 사용한다. 실시간 데이터가 중요하다면 { cache: 'no-store' }를 사용해서 늘 새로운 요청을 보낼 수 있다.
+
+또한 1초 단위 수준으로 데이터 요청이 필요없는 페이지들은 fetch('/URL', { next: { revalidate: 60 } }) 과 같이 사용해서(초단위 기입) 지정된 시간마다 캐싱할 수 있다.
+
+DB의 출력 결과를 캐싱 가능한가? 가능하다.
+
+1. db에서 데이터를 가져오는 코드를 서버 API로 돌려두고 fetch에서 그 서버 API로 요청하면 된다.
+
+2. 두번째 방법은 페이지 단위로 캐싱가능하다. export const revalidate
+   = 60; 과 같이 작성하면 된다. 예전 next에서는 ISR이라고 불렸따. (list2 페이지 참고)
+
+\*\*캐싱결과를 확인하기 위해선 반드시 개발서버(npm run dev)가 아니라 실제서버(npm run build/npm run start) 띄워야합니다!
+
+### 1024
+
+게시물을 '로그인 한 사람' 만 볼 수 있게? => 회원기능이 필요
+
+1. 유저 -> id/pw -> DB 에 보내고,
+2. 그 이후에 중간에 있는 서버는 DB에 있는 id/pw와 일치하는지 비교 작업을 진행하게 됨. 그리고 유저에게 입장권을 주게됨. (입장권은 유저자료가 써있는 간단한 문자자료, 누구고, 언제 로그인했고.. 등등)
+3. 서버에 GET/POST 요청시, 그 입장권을 함께 보여준 뒤 이상이 없으면 게시물 데이터를 보내주는게 회원기능의 방식이다.
+
+브라우저 쿠키저장소(Cookies)에 저장된 문자열들이 바로 입장권들을 몰래 저장시킨다.
+
+입장권을 만들때에는 여기서 택1 하십시오.
+
+1. session 방식: session id만 달랑 적혀있다. 유저가 로그인을 완료하면 DB에 아이디/로그인날짜/유효기간/ session id를 기록하는데, 유저한테 입장권을 발급해줄때, 세션id만 달랑보내줌. 그래서 확인할때에도 DB에서도 간단하게 session id만 대조해본다.
+   장점: 유저의 get/post 요청마다 로그인상태 체크가능
+   단점: DB짱이 힘들어함 -> redis같은 session 보관에 특화된 DB써도 좋습니다.
+
+2. token 방식: 거의다 JWT이다. 일단 유저가 로그인을 성공하면 유저한테 입장권을 주는데, 입장권에 아이디,로그인날짜,유효기간 등을 '암호화'해서 보낸다. 유저가 다시 get/post등을 요청하면 입장권을 까보고 이거 보고 별 이상없으면 통과시켜줌. 간단한 토큰 방식.. 보안상 허술하거나 이상해보이겠지만, 암호화되기 때문에 짧은 문자열이 변화해도 위조가 드러나기 때문에 괜찮다.
+   장점: DB조회를 안하기 떄문에, 유저 많거나 마이크로 서비스 운영중이면 편하다.
+   단점: 나쁜놈이 훔쳐가면 그 사람이 로그인하는걸 막을 수 없다. 다른 컴퓨터 로그아웃 거의 불가능..
+
+OAuth의 개념
+입장권 개념이 아니라, 유저가 A사이트에 입장하면 사용권한이 있는데, 그 사용권한을 B사이트를 운영하는 누군가가 유저대신 A사이트의 권한을 빌릴 수 있다. 동의 절차가 지나면 A사이트는 유저 정보들을 제공한다.. 이것을 잘 이용하면 A사이트의 회원정보를 B사이트에서 사용할 수 있는 것.. 회원가입시 사용하는 것 --> 우리가 잘아는 소셜로그인(네이버,카카오,구글 등)
+
+Next.js는 NextAuth.js 와 Auth.js 가 있어서 라이브러리 설치하고 코드 복붙하면 끝임. 소셜로그인, 아이디/비번 로그인 전부 구현 가능합니다. JWT, session 방식 구현도 가능합니다. DB adapter 기능을 이용하면 DB에 session을 저장해두고 유저 관리도 가능합니다.
+
+단점은 id/pw 방식 사용시 tokken 방식(JWT)만 써야됨. 이는 개발자가 직접 id/pw 취급하면 보안이슈가 있어서 ... 어쩌고 session 금지당했음.
