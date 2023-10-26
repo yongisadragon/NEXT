@@ -177,3 +177,31 @@ OAuth로 소셜로그인 만들기! : 아이디/비번관리 필요없음. 그�
 
 로그인 버튼은 useclient로 따로 작성해주고, signIn() 함수를 끌어다 쓰면 기능 끝이다.
 로그인하고나면, 로그인 유저정보 출력을 위해선 서버컴포넌트, 서버기능 안에서 getServerSession()을 통해 볼 수 있다. 대충 변수에 담아서 찎어보면 name,email,image등이 나오네요. 알아서 활용하면 됩니다.
+
+### 1026
+
+기본적으로 next-auth는 JWT 방식으로 동작을함.(토근) 로그인하면 JWT입장권을 만들어서 유저한테 보내주고, JWT까보고 별이상 없으면 입장시켜줌. 로그인 구현은 쉽지만, 이 방식이 싫다면,
+DB adapter을 켜놓으면 session을 사용해서 유저를 관리하는데, 첫로그인시 자동회원가입. DB에 보관한다. 그래서 로그인된 유저정보가 필요하면 DB에서 조회해본다.. `npm install @next-auth/mongodb-adapter` 안되면 npm unistall mongodb -> npm i mongodb@4 하고 다시 설치.
+다됐으면 [...nextauth].js 의 providers에 adpter: MongoDBAdapter(connectDB), 항복을 import하고 추가해준다.
+
+다른 DB쓰려면 다른 db adapter 세팅해주면됨. 예를들어 redis는 데이터 저장을 하드가 아니라 램에 저장해주기 때문에 session 방식을 구현할때 즐겨쓴다고 한다.
+
+아무튼 어댑터 설정하고 로그인을 하면, db를 확인해보자. accounts, sessiopns, users등.. 첨보는 컬렉션이 추가되어있을것이다.(아마도 test라는 곳에 생김)
+
+1. sessions: 현재 로그인된 유저 세션정보 저장용. 유저 한명이 로그인 할때마다 해당 컬렉션에 도큐먼트가 하나씩 발행된다. 세션토큰, 아이디, expires도 있다 임의로 수정 삭제도 가능하다.
+2. users: 가입된 유저들 정보.
+3. accounts: 유저의 계정정보가 들어가있음. 2번과 3번은 하나의 유저가 여러가지 계정을 가지고 있을 수 있기 때문.. github+google 등.. users도큐먼트에는 한사람의 정보만 있고, accounts는 다수의 계정을 가지고 있을 경우 여러개가 생긴다. email이 같으면 같은 유저로 간주함..
+
+다른 database에 유저정보 저장하려면. database.js 안의 url. ...mongodb.net/?...을 ...mongodb.net/forum?... 처럼 지정해주면 된다.
+
+그렇다면 본인이 쓴 글만 수정/삭제하려면? 삭제기능을 업그레이드하면됨.
+기존: 누가 삭제 api 요청하면 '그냥' 삭제새버림 => 업그레이드: 요청자 == 글쓴이 일치하면 삭제해주는 식으로 수정.. 그러기 위해선 **글을 작성할때마다 어떤유저가 작성하는지.. 이메일이나 id등을 함께 글작성 기능에 넣어주자.**
+
+이런식이면 될거같은데요?
+post/new.js
+
+```let session = await getServerSession(요청, 응답, authOptions);
+  if (session) {
+    요청.body.author = session.user.email;
+  }
+```

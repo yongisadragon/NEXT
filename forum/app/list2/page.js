@@ -12,7 +12,7 @@ export default async function List() {
     a._id = a._id.toString();
     return a;
   });
-  console.log(result);
+  // console.log(result);
   return (
     <div className="list-bg">
       <ListItem result={result} />

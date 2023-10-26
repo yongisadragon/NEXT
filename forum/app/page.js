@@ -9,7 +9,7 @@ export default async function Home() {
   const db = (await connectDB).db("forum");
   // post 컬렉션에 있는 모든 데이터를 가져와서 array로 변환해주세요.
   let result = await db.collection("post").find().toArray();
-  console.log(result);
+  // console.log(result);
   return (
     <>
       <main>{result[0].title}</main>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import LoginBtn from "./LoginBtn";
+import LogoutBtn from "./LogoutBtn";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
@@ -13,9 +14,9 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  //서버컴포넌트에서 로그인 유저정보 출력.
+  //서버컴포넌트에서 로그인 유저정보 출력. 만약 client에서 사용하려면   let session  = useSession(); 식으로 사용하면 된다.
   const session = await getServerSession(authOptions);
-  console.log(session);
+  // console.log(session);
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -25,7 +26,14 @@ export default async function RootLayout({ children }) {
           </Link>
           <Link href="/list">List</Link>
           <Link href="/write">Write</Link>
-          <LoginBtn></LoginBtn>
+
+          {session ? (
+            <>
+              <div>{session.user.name}</div> <LogoutBtn />
+            </>
+          ) : (
+            <LoginBtn />
+          )}
         </div>
         {children}
       </body>

@@ -64,7 +64,8 @@ export default function ListItem(props) {
 
                 //다른방법. 다이나믹 라우터를 활용한 요청
                 //url의 []자리에 아무거나 입력해도, 다이나믹으로 작성한 api의 코드를 실행해주는데, 이를이용해서 다른 문자나 데이터를 입력해도, 다이나믹 라우터로 입력한 파일안에서 req.query로 동일하게 데이터를 받을 수 있다.
-                fetch(`/api/abc/${item._id}`, { method: "DELETE" })
+                // fetch(`/api/abc/${item._id}`, { method: "DELETE" }) -> 이런경우에만 서버기능에서 req.query로 url출력될수 있다. 이건 아마 item._id 값과 동일.
+                fetch(`/api/post/delete`, { method: "DELETE", body: item._id })
                   .then((res) => res.json())
                   .then(() => {
                     e.target.parentElement.style.opacity = 0;

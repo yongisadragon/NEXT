@@ -9,7 +9,7 @@ export default async function Edit(props) {
     .collection("post")
     .findOne({ _id: new ObjectId(props.params.id) });
   // _id는 DB에는 ObjectId ~ 어쩌고로 돼있어서 일반문자로 바꿔야한다.
-  console.log(result._id.toString());
+  // console.log(result._id.toString());
   return (
     <>
       <h4>글수정</h4>
