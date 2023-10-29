@@ -205,3 +205,15 @@ post/new.js
     요청.body.author = session.user.email;
   }
 ```
+
+### 1029
+
+소셜로그인말고 (OAuth) 전통적 방식의 id/pw를 사용하고 싶으신가요?
+-> CredentialsProvier() 을 추가해보십시오.
+
+그전에, 회원가입 기능을 상상해보자.
+
+1. 회원가입 페이지 생성 (form관련 ui등)
+2. 서버는 가입요청을 받고 DB에 저장하도록 기능만들면 될듯요
+
+애당 서버기능으로 DB에 저장을 완료했다면(이메일 중복검사, 비번 유효성 검사등도 필요), next-auth 에서 인식가능하도록 credentials provier를 설정하면 됩니다.
