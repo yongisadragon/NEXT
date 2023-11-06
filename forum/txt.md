@@ -217,3 +217,91 @@ post/new.js
 2. 서버는 가입요청을 받고 DB에 저장하도록 기능만들면 될듯요
 
 애당 서버기능으로 DB에 저장을 완료했다면(이메일 중복검사, 비번 유효성 검사등도 필요), next-auth 에서 인식가능하도록 credentials provier를 설정하면 됩니다.
+
+### 1104
+
+JWT(토큰) 방식을 사용할시 하나의 입정권을 주고 그걸 계속 사용하게 하는데, 고객정보, 유효기간 등이 들어 있기 때문에 그것을 통해 누구인지 , 이메일이 무엇인지 쉽게 알 수 있음.
+근데 유효기간을 이를테면 1년.. 길게 설정하면 탈취 당했을때 해당 기간동안 대응을 할 수가 없음.
+그래서 보통 입장권 expires는 30분등 짧게 유지하는 경우가 많음. 그럴 경우 유저에게 유효기간이 지날때마다 재로그인을 요구하기는 번거로우니 유효시간이 지나면 새로운 입장권을 자동으로 발급해주는 식으로 코드를 짬. (refresh token)
+
+(case 1)
+유저 : "서버야 내 입장권 유효기간 지났어 새로 하나 줘"
+서버 : "그래 입장권 보낸다"
+이래도 될 거 같은데 그럼 입장권이 도난당할시 그 유저는 계속 사이트 이용권한을 가지게 되어 위험할 수 있습니다.
+
+(case 2)
+유저 : "서버야 내 입장권 유효기간 지났어 재발급용 token 보낼테니 입장권 새로 하나 줘"
+서버 : "그래 재발급용 token 니꺼맞나 DB에서 확인해보고 입장권 보낸다"
+
+이게 더 안전합니다.
+
+입장권용 token을 멋진 말로 access token
+재발급용 token을 멋진 말로 refresh token
+
+Q. refresh token도 도둑맞으면 똑같은거 아녀요?
+실은 rftk도 쿠기 같은 곳에 유저에게 보관하도록 하기 때문에 도난이 쉬움. 근데 rftk 을 DB에도 저장해 놓기 때문에 서버측에서 비교대조해서 도난 당했는지 대응할 수 있음. (IP감지하거나, 이미 사용한 rftk인지 확인해서)
+
+Q. DB를 조회하는 일이 생기면, 그건 session방식이랑 똑같아지는게 아녀요?
+실은 맞습니다만, 세션보다 조희를 덜 하게됩니다. refresh token 사용할 때만 DB 조회해보면 되니까요.
+
+github oauth 에서 제공하는 refresh token 사용법
+
+(/pages/api/auth/[...nextauth].js)
+
+(import 어쩌구 생략)
+
+export const authOptions = {
+providers: [
+GithubProvider({
+clientId: 'Github에서 발급받은ID',
+clientSecret: 'Github에서 발급받은Secret',
+}),
+],
+
+//기간설정은 무시됨, github은 access token 유효기간 8시간, refresh token 유효기간 6개월
+jwt : {
+maxAge: 60,
+},
+callbacks: {
+// JWT 사용할 때마다 실행됨, return 오른쪽에 뭐 적으면 그걸 JWT로 만들어서 유저에게 보내줌
+async jwt({ token, account, user }) {
+console.log('account', account);
+console.log('user', user);
+console.log('token', token);
+
+      // 1. 첫 JWT 토큰 만들어주기 (첫 로그인시에만 실행)
+      if (account && user) {
+        return {
+          accessToken: account.access_token,
+          refreshToken: account.refresh_token,
+          accessTokenExpires: account.expires_at,
+          user,
+        }
+      }
+
+      // 2. 남은 시간이 임박한 경우 access token 재발급하기
+      // 지금은 개발중이라 8시간 - 10초 남았을 때 재발급중
+      let 남은시간 = token.accessTokenExpires - Math.round(Date.now() / 1000)
+      if (남은시간 < (60 * 60 * 8 - 10) ) {
+        console.log('유효기간 얼마안남음')
+        let 새로운JWT = await refreshAccessToken(token) // 3. 깃헙에게 재발급해달라고 조르기
+        console.log('새로운 JWT : ', 새로운JWT)
+        return 새로운JWT
+      } else {
+        return token
+      }
+    },
+
+    //getServerSession 실행시 토큰에 있던 어떤 정보 뽑아서 컴포넌트로 보내줄지 결정가능
+    async session({ session, token }) {
+      session.user = token.user
+      session.accessToken = token.accessToken
+      session.accessTokenExpires = token.accessTokenExpires
+      session.error = token.error
+      return session
+    },
+
+},
+secret : 'password1234',
+}
+export default NextAuth(authOptions)
