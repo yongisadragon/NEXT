@@ -59,7 +59,7 @@ export const authOptions = {
     //user변수는 DB의 유저정보담겨있고 token.user에 뭐 저장하면 jwt에 들어갑니다.
     jwt: async ({ token, user }) => {
       if (user) {
-        //JWT에 기입할 정보들, 추후에 역할이나 레벨등을 토큰에 추가저장 가능.
+        //JWT에 기입할 정보들, 추후에 역할(token.user.role = ... 등으로)이나 레벨등을 토큰에 추가저장 가능. 유저정보에 role: 'admin'으로 돼있으면 항상 수정/ 삭제 가능하도록. (role-based auth)
         token.user = {};
         token.user.name = user.name;
         token.user.email = user.email;
