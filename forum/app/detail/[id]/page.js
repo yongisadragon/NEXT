@@ -1,5 +1,6 @@
 import { connectDB } from "@/util/database";
 import { ObjectId } from "mongodb";
+import Comment from "./Comment";
 
 export default async function page(props) {
   const db = (await connectDB).db("forum");
@@ -9,12 +10,16 @@ export default async function page(props) {
   let result = await db
     .collection("post")
     .findOne({ _id: new ObjectId(props.params.id) });
-  console.log(props.params.id); //id는 왜 id냐. dynamic router를 이용해서 detail/[id]의 [] 안에 지어준 네이밍임. props.params는 detail폴더 하위 폴더들을 obj 키값으로 가짐.
+  //console.log(props.params.id); //id는 왜 id냐. dynamic router를 이용해서 detail/[id]의 [] 안에 지어준 네이밍임. props.params는 detail폴더 하위 폴더들을 obj 키값으로 가짐.
+
   return (
     <>
-      <h4>상세페이지</h4>
-      <h4>{result.title}</h4>
-      <p>{result.content}</p>
+      <div className="p-20">
+        <h4>상세페이지</h4>
+        <h4>{result.title}</h4>
+        <p>{result.content}</p>
+        <Comment _id={result._id.toString()} />
+      </div>
     </>
   );
 }
