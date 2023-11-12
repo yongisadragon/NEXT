@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     //보낼때에는 stringify -> db -> 다시 읽을 때는 parse
     req.body = JSON.parse(req.body);
     const session = await getServerSession(req, res, authOptions);
-    // console.log(session);
+    console.log(req.body);
 
     let 저장할거 = {
       content: req.body.comment,
@@ -18,6 +18,10 @@ export default async function handler(req, res) {
     };
     const db = (await connectDB).db("forum");
     let result = await db.collection("comment").insertOne(저장할거);
-    res.status(200).json("저장완료");
+    let commentList = await db
+      .collection("comment")
+      .find({ parent: new ObjectId(req.body._id) })
+      .toArray();
+    res.status(200).json(commentList);
   }
 }
