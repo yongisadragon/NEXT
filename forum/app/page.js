@@ -12,8 +12,12 @@ export default async function Home() {
   // console.log(result);
   return (
     <>
-      <main>{result[0].title}</main>
-      <h3>{result[0].content}</h3>
+      {result ?? (
+        <div>
+          <main>{result[0]?.title}</main>
+          <h3>{result[0]?.content}</h3>
+        </div>
+      )}
     </>
   );
 }

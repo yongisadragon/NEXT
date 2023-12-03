@@ -359,3 +359,184 @@ error.js를 만들어두면 'page.js'가 로딩중일때, error .js를 보여줌
 <!-- ?not-found.js -->
 
 이 세가지 파일의 특징은 같은 폴더안에 없으면 끝까지 상위추적하니 최상위 폴더에도 app폴더에 놓아도 됨. 최상위 layout.js의 로딩,에러,notfound는 추가하고 싶으면 더 상위에 추가해야됨.
+
+### 1120
+
+최종 작업을 끝내면
+`npm run build` 및 `npm run start`로 서버를 띄울 수 있는데, 이러면 단순히 우리 컴퓨터에서 서버를 운영하는 것이다. 컴퓨터를 틀어놓을 순 없으니, 안전한 클라우드 서비스로 컴퓨터를 빌려 AWS를 알아보자.
+
+실은 AWS에는 EC2 상품이 가장 유명한데 그냥 컴퓨터 한대를 빌리는 상품입니다. 하지만 숙련자가 아니면 거기에 서버 띄우고 그런 짓거리하는게 매우 오래걸리고
+나중에 일생겼을 때에도 해결이 어렵습니다.
+
+그래서 보통 편하게 하려면 `AWS Elastic Beanstalk` 상품 사용하면 됩니다.
+
+얘는 코드만 올리면 지가 알아서 자동으로 EC2 인스턴스 빌려서 npm install 눌러주고 npm run start 눌러주고 무료 도메인도 하나 연결해주고 유저 많아지면 확장도 쉽게 가능하고 아마 버전관리도 해줍니다. 여러분은 그냥 코드 업로드밖에 신경쓸게 없습니다. 가격도 거의 차이없음
+
+**_아니면 Vercel_**
+
+실은 Next.js는 Vercel 이런거 이용해도 배포가 매우 쉽습니다. 왜냐면 Next.js를 Vercel이 만들고 관리해서 그렇습니다. Github repo에 코드 올릴 때 마다 그걸 자동으로 Elastic Beanstalk 스럽게 배포해주는 식으로 동작합니다.
+
+- 그래서 포트폴리오 용으로는 가장 편리하고 괜찮습니다. vercel.com 들어가서 그대로 따라하면 되는거라 튜토리얼 그딴거 필요없음
+
+**_배포전 체크사항_**
+AWS 컴퓨터도 MongoDB에 접속을 해야 데이터를 꺼내든말든 할 것 아닙니까
+mongodb.com 들어가서 좌측 Network access 메뉴에서 접속가능 IP를 0.0.0.0 으로 (모두접속가능하게) 바꿔줍시다. 더 안전하게 하고 싶으면 나중에 AWS VPC로 mongodb atlas 연결하는 법 같은걸 찾아서 적용해줍시다.
+
+1. 터미널 열어 `npm run build`
+
+2. 배포하려면zip 파일로 압축합니다
+   프로젝트 폴더안에 있는 모든 내용을 .zip 파일로 압축합니다.
+
+- node_modules 폴더는 넣지마쇼
+- .next 폴더는 꼭 넣으쇼
+
+3. AWS 로그인하고 카드등록하고
+
+- 카드등록까지 해야 1년 AWS 똥컴 무료이용권을 주기 때문에 카드등록 하면 되고
+- 로그인하면 우측 상단에 지역선택을 할 수 있는데 사이트를 서울에서 운영할거면 '서울'로 들어옵시다.
+
+4. AWS 사이트 상단 검색창에 IAM 검색해서 들어갑시다
+   좌측 메뉴의 역할 눌렀을 때
+   aws-elasticbeanstalk-ec2-role 역할 이름이 없으면 역할 만들기 누릅니다.
+   elastic beanstalk이 ec2 맘대로 사용할 수 있게 만드는 부분임
+
+(1단계) 신뢰할 수 있는 엔터티는 AWS 서비스, 사용사례는 EC2 선택
+(2단계) 권한추가메뉴에선
+
+AWSElasticBeanstalkWebTier
+AWSElasticBeanstalkWorkerTier
+AWSElasticBeanstalkMulticontainerDocker
+
+3개 찾아서 체크마크
+
+(3단계) 이름 지정부분은 aws-elasticbeanstalk-ec2-role 기입하고 끝냅시다.
+실은 Elastic beanstalk 처음 만들 때 IAM 설정은 알아서 해주는데
+지금은 버그때문에 쓸데없이 직접 해줘야함
+
+5. Elastic beanstalk
+
+- 상단 검색창에 Elastic beanstalk 검색해서 들어갑시다.
+  그럼 앱생성이나 환경생성 버튼 어딘가에 있을텐데 그거 눌러서 진행합시다.
+
+...
+
+-이미지는 DB에 저장? 해도 되지만 하드 디스크에 저장하는 편이 나음.
+
+Vercel 호스팅 중이거나 AWS에서 인스턴스 여러개 사용중이라면 하드빌려주는 클라우드 서비스 AWS S3 라는게 대표적. (5GB까지 무료)
+
+요즘은 Presigned URL 으로 서버를 거치지 않고 S3로 바로 업로드하기도 함니다. (대충 서버에게 이미지 업로드 하겠다고 요청하면 한정된 시간동안만 유효하는 Presigned URL을 주고, 그것을 이용해서 S3에 바로 업로드.)
+
+유저가 업로드할 이미지를 하나 고르면 그걸 유저에게 미리 보여줘야하지 않겠습니까
+
+createObjectURL 같은걸 써도 보여줄 수 있는데
+
+근데 보통은 편하게하려면 유저가 이미지를 <input type="file">에서 고르는 순간 그냥 S3에 집어넣으면 됩니다.
+
+그리고 집어넣은 후에 이미지 URL을 <img src=" "> 안에 넣으면 이미지를 보여줄 수 있습니다.
+
+예전엔 직접 서버에서 이미지를 업로드하는 식으로 코드를 짰다면 요새 S3에서는 Presigned URL 이라는 방식으로 이미지를 업로드합니다. Presigned URL을 가진 모든 유저는 브라우저에서 서버안거치고 직접 S3에 업로드가 가능한데 그러면 서버부담이 덜해져서 좋으니 그렇게 쓰는 것이고 어떤 식인지 구체적으로 설명해보면
+
+1. 글작성 페이지의 <input>에서 유저가 이미지 고르는 순간 서버에게 GET요청을 합니다. 심심하니까 이미지 이름도 같이 보내줌
+
+2. 그럼 서버는 괜찮은 유저인지 이거저거 검사해보고 Presigned URL을 만들어서 유저 브라우저로 보내줌
+
+3. 유저는 브라우저에서 Presigned URL을 이용해서 S3로 POST요청해서 바로 이미지를 보냅니다.
+
+4. 업로드 성공시 업로드된 이미지의 URL을 <img src=" ">에 박아서 이미지 업로드된걸 보여줌
+
+이런 식으로 개발합니다.
+
+`npm install aws-sdk ` 설치해서 AWS 다룰수 있는 라이브러리 설치하고 사용.
+키와 관련된건 .env 파일로 분리해서 사용. (변수담는 파일)
+
+```
+(/write/page.js)
+
+'use client'
+export default function Write(){
+  return (
+    <div className="p-20">
+      <h4>글작성</h4>
+        <form action="/api/post/new" method="POST">
+        <input name="title" placeholder="글제목"/>
+        <input name="content" placeholder="글내용"/>
+        <button type="submit">전송</button>
+      </form>
+
+      <input type="file" accept="image/*" onChange={
+        async (e)=>{
+//api/post/image로 쿼리와 함께 자료전송
+          let file = e.target.files[0]
+          let filename = encodeURIComponent(file.name)
+          let res = await fetch('/api/post/image?file=' + filename)
+          res = await res.json()
+
+//S3로 formData 업로드
+          const formData = new FormData()
+          Object.entries({ ...res.fields, file }).forEach(([key, value]) => {
+            formData.append(key, value)
+          })
+          let 업로드결과 = await fetch(res.url, {
+            method: 'POST',
+            body: formData,
+          })
+          console.log(업로드결과)
+
+          if (업로드결과.ok) {
+            setSrc(업로드결과.url + '/' + filename)
+          } else {
+            console.log('실패')
+          }
+        }
+      } />
+      <img />
+
+    </div>
+  )
+}
+```
+
+```
+.env(루트경로)
+ACCESS_KEY=액세스키어쩌구
+SECRET_KEY=액세스키시크릿
+BUCKET_NAME=님들버킷명
+```
+
+```
+
+//서버에게 Presinged URL요청
+(/api/post/image.js)
+
+import aws from 'aws-sdk'
+export default async function handler(요청, 응답){
+    aws.config.update({
+      accessKeyId: process.env.ACCESS_KEY,
+      secretAccessKey: process.env.SECRET_KEY,
+      region: 'ap-northeast-2',
+      signatureVersion: 'v4',
+    })
+
+    const s3 = new aws.S3();
+    const url = await s3.createPresignedPost({
+      Bucket: process.env.BUCKET_NAME,
+      Fields: { key : 요청.query.file },
+      Expires: 60, // seconds
+      Conditions: [
+        ['content-length-range', 0, 1048576], //파일용량 1MB 까지 제한
+      ],
+    })
+
+    응답.status(200).json(url)
+}
+```
+
+결과적으로 input 태그에서 onChange 안에서 fetch통해 서버로 Presinged URL요청. 요청 을 보내면 result로 반환되는 값이 이미지가 포함된 '링크'를 보내줌.(s3가 보내주는 자료임) 그 이미지 링크 자료를 formdata에 담아 post요청하면 끝. formDta는 가상의 form임. form태그랑 같은 기능을함. append에 여러가지 데이터를 담아서 http요청.
+이 url자료를 html태그에서 보여줄거면 직접 넣을 순 없고, state에 담아서 쓰든지 하십소. 풀 url은 filename까지 더해주면 완전하게 완성될 것임. 엄격하게 할거면 result 업로드결과.ok 체크하고 넘어가면 좋겠죠.
+
+상세페이지에서도 글과 함께 이미지를 db로 보내면 될것같습니다.
+
+Q. 유저가 글발행 안하고 뒤로가기 누르면 S3 저장용량 낭비아님?
+
+- 지금은 선택과 동시에 이미지를 업로드하고 있는데 글발행 누르면 이미지 업로드시키면 되겠군요.
+  업로드 전에 유저가 선택한 이미지 보여주려면 createObjectURL을 씁시다.
