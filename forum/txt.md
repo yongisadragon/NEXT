@@ -602,3 +602,6 @@ Cookie의 단점은
 오늘의 결론:
 -js잘해야 next도 잘함.
 -state나 변수를 영구보관하고 싶으면 db에 넣어두는데 사소하고 귀찮은 것들은 localStorage 또는 cookies 저장공간을 사용해도 반영구로 저장가능
+
+cookie로 className 재배치, 전환 버튼까지 달았는데 새로고침을 해야 바뀐다면?
+cookie가 바뀌었따고 html이 재렌더링이 되지는 않기 때문임.

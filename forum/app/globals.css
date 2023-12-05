@@ -51,16 +51,42 @@ a {
 .navbar {
   background: white;
   padding: 20px;
+  overflow: hidden;
 }
 .navbar a {
   margin-right: 10px;
   text-decoration: none;
   color: black;
 }
+.navbar span {
+  cursor: pointer;
+  margin-left: 20px;
+}
+.navbar span:hover {
+  filter: brightness(0.8);
+  transition: 0.3s;
+}
+
 .logo {
   font-weight: bold;
 }
 
 p {
   margin: 2px;
+}
+
+.dark-mode .navbar {
+  background-color: #222;
+}
+.dark-mode .navbar a,
+.dark-mode span {
+  color: white;
+}
+.rightNav {
+  float: right;
+}
+
+body {
+  margin: 0;
+  padding: 0;
 }

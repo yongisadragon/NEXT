@@ -64,7 +64,7 @@ export default function Comment(props) {
               <p>{item.content}</p>
             </div>
           ))
-        : "로딩중"}
+        : "댓글없음니다"}
 
       <input
         placeholder="댓글입력"
