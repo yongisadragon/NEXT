@@ -5,7 +5,7 @@ import LoginBtn from "./LoginBtn";
 import LogoutBtn from "./LogoutBtn";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
-
+import { cookies } from "next/headers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -17,6 +17,10 @@ export default async function RootLayout({ children }) {
   //서버컴포넌트에서 로그인 유저정보 출력. 만약 client에서 사용하려면   let session  = useSession(); 식으로 사용하면 된다.
   const session = await getServerSession(authOptions);
   // console.log(session);
+
+  let res = cookies().get("value");
+  console.log(res);
+
   return (
     <html lang="en">
       <body className={inter.className}>
