@@ -15,7 +15,7 @@ export default function Darkmode({ mode }) {
       document.cookie = `mode=light; max-age=${3600 * 24 * 400}`;
     }
   }, []);
-  console.log(mode);
+  // console.log(mode);
   return (
     <span
       onClick={() => {
@@ -27,8 +27,7 @@ export default function Darkmode({ mode }) {
           document.cookie = `mode=dark; max-age=${3600 * 24 * 400}`;
           router.refresh();
         }
-      }}
-    >
+      }}>
       {isDark ? "☀️" : "🌙"}
     </span>
   );

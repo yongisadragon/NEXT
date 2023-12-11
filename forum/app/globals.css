@@ -52,6 +52,8 @@ a {
   background: white;
   padding: 20px;
   overflow: hidden;
+  color: black;
+  transition: 0.3s;
 }
 .navbar a {
   margin-right: 10px;
@@ -77,10 +79,12 @@ p {
 
 .dark-mode .navbar {
   background-color: #222;
+  transition: 0.3s;
 }
 .dark-mode .navbar a,
 .dark-mode span {
   color: white;
+  transition: 0.3s;
 }
 .rightNav {
   float: right;

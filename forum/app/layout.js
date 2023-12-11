@@ -20,15 +20,14 @@ export default async function RootLayout({ children }) {
   // console.log(session);
 
   let cookie = cookies().get("mode").value;
-  console.log(cookie);
+  // console.log(cookie);
 
   return (
     <html lang="en">
       <body
         className={
           cookie !== "undefined" && cookie == "dark" ? "dark-mode" : ""
-        }
-      >
+        }>
         <div className="navbar">
           <Link href="/" className="logo">
             용포럼
